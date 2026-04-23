@@ -1,78 +1,58 @@
 import React from 'react';
-import { 
-  FaHome, 
-  FaFire, 
-  FaMusic, 
-  FaHistory, 
-  FaTimes,
-  FaHeart,
-} from 'react-icons/fa';
+import { FaHome, FaCompass, FaMusic, FaSignOutAlt, FaTimes } from 'react-icons/fa';
 
-const Sidebar = ({ open, onToggle }) => {
-  const menuItems = [
-    { icon: FaHome, label: 'Home' },
-    { icon: FaFire, label: 'Trending' },
-    { icon: FaMusic, label: 'Library' },
-    { icon: FaHistory, label: 'History' },
-    { icon: FaHeart, label: 'Liked' },
-  ];
+const navItems = [
+  { icon: FaHome, label: 'Home', path: '#' },
+  { icon: FaCompass, label: 'Explore', path: '#', active: true }, // active state
+  { icon: FaMusic, label: 'Library', path: '#' },
+];
 
+const Sidebar = ({ open, onClose }) => {
   return (
     <>
-      {/* Overlay for mobile */}
+      {/* Background Dimmer for mobile */}
       {open && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
-          onClick={onToggle}
-        ></div>
+        <div 
+          className="fixed inset-0 bg-black/80 z-40 lg:hidden backdrop-blur-sm" 
+          onClick={onClose}
+        />
       )}
 
-      {/* Sidebar */}
-      <aside
-        className={`fixed md:relative w-64 bg-gray-900 text-white h-screen overflow-y-auto border-r border-gray-800 transition-transform duration-300 z-40 ${
-          open ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-        }`}
-      >
-        {/* Close button for mobile */}
-        <div className="flex justify-between items-center p-6 md:hidden border-b border-gray-800">
-          <h2 className="text-xl font-bold">Menu</h2>
-          <button onClick={onToggle} className="text-gray-400 hover:text-white">
-            <FaTimes size={24} />
-          </button>
+      {/* The Sidebar */}
+      <aside className={`fixed inset-y-0 left-0 z-50 w-64 transform ${open ? 'translate-x-0' : '-translate-x-full'} lg:relative lg:translate-x-0 transition-transform duration-300 ease-out bg-zinc-950 border-r border-zinc-900 flex flex-col p-6`}>
+        
+        {/* Mobile Close Button */}
+        <button onClick={onClose} className="lg:hidden absolute top-6 right-6 p-2 text-zinc-400 hover:text-white rounded-lg">
+            <FaTimes size={18} />
+        </button>
+
+        {/* Header (re-added logo for proper sidebar weight) */}
+        <div className="flex items-center gap-3 mb-12">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center">
+                <FaMusic className="text-white" size={18} />
+            </div>
+            <span className="text-xl font-black tracking-tighter text-white">SOUNDWAVE</span>
         </div>
 
-        {/* Menu Items */}
-        <nav className="p-6 space-y-1">
-          {menuItems.map((item, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-gray-800 cursor-pointer transition group"
+        {/* Navigation */}
+        <nav className="flex-1 space-y-3">
+          {navItems.map((item, idx) => (
+            <a 
+              key={idx} 
+              href={item.path} 
+              className={`flex items-center gap-4 px-4 py-3 rounded-xl text-lg font-semibold transition ${item.active ? 'bg-zinc-800 text-white shadow-md' : 'text-zinc-400 hover:text-white hover:bg-zinc-900'}`}
             >
-              <item.icon className="text-gray-400 group-hover:text-blue-400 transition" size={20} />
-              <span className="font-medium group-hover:text-blue-400 transition">{item.label}</span>
-            </div>
+              <item.icon className={item.active ? 'text-blue-500' : 'text-zinc-600'} size={18}/>
+              {item.label}
+            </a>
           ))}
         </nav>
 
-        {/* Divider */}
-        <div className="border-t border-gray-800 my-6"></div>
-
-        {/* Playlists Section */}
-        <div className="px-6 pb-6">
-          <h3 className="text-gray-400 text-sm font-semibold uppercase mb-4 tracking-wider">Playlists</h3>
-          <div className="space-y-2">
-            {['Favorites', 'Recently Played', 'Workout Mix'].map(
-              (playlist, index) => (
-                <div
-                  key={index}
-                  className="px-4 py-2.5 rounded-lg hover:bg-gray-800 cursor-pointer text-gray-400 hover:text-white transition text-sm"
-                >
-                  {playlist}
-                </div>
-              )
-            )}
-          </div>
-        </div>
+        {/* Footer */}
+        <button className="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-lg font-semibold text-red-500 hover:bg-red-950 transition">
+          <FaSignOutAlt className="text-red-700" size={18}/>
+          Logout
+        </button>
       </aside>
     </>
   );
