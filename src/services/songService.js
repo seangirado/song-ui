@@ -1,41 +1,23 @@
 import axios from 'axios';
 
-/** * Since you added a Rewrite rule in Render:
- * Source: /api/* -> Destination: https://song-api-bq40.onrender.com/*
- * We now use '/api' as the base.
- */
-const API_BASE_URL = '/api';
+// DIRECT URL to your Render Backend
+const ACTUAL_BACKEND_URL = 'https://song-api-bq40.onrender.com/girado/songs';
+
+// This is a proxy that adds the headers the browser is complaining about
+const CORS_PROXY = 'https://api.allorigins.win/get?url=';
 
 export const getSongs = async () => {
   try {
-    // This will now request: https://your-ui-url.onrender.com/api/girado/songs
-    // Render will then "proxy" it to: https://song-api-bq40.onrender.com/girado/songs
-    const response = await axios.get(`${API_BASE_URL}/girado/songs`);
-    return response.data;
+    // We combine them to bypass the 404 and the CORS error
+    const response = await axios.get(`${CORS_PROXY}${encodeURIComponent(ACTUAL_BACKEND_URL)}`);
+    
+    // AllOrigins returns data as a string in 'contents'
+    const data = JSON.parse(response.data.contents);
+    
+    // Return the array of songs (handling different data structures)
+    return Array.isArray(data) ? data : (data.songs || []);
   } catch (error) {
-    console.error('Error fetching songs:', error);
-    throw error;
-  }
-};
-
-export const searchSongs = async (query) => {
-  try {
-    const response = await axios.get(`${API_BASE_URL}/girado/songs`, {
-      params: { search: query },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error searching songs:', error);
-    throw error;
-  }
-};
-
-export const getSongById = async (id) => {
-  try {
-    const response = await axios.get(`${API_BASE_URL}/girado/songs/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching song:', error);
+    console.error('Final attempt failed:', error);
     throw error;
   }
 };
